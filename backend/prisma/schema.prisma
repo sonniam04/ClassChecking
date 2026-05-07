@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String
+  fullName  String
+  studentId String?  @unique
+  createdAt DateTime @default(now())
+
+  taughtCourses Course[]
+  enrollments   Enrollment[]
+  attendances   Attendance[]
+}
+
+model Course {
+  id        Int      @id @default(autoincrement())
+  name      String
+  teacherId Int
+  teacher   User     @relation(fields: [teacherId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  schedules   CourseSchedule[]
+  sessions    Session[]
+  enrollments Enrollment[]
+}
+
+model CourseSchedule {
+  id        Int    @id @default(autoincrement())
+  courseId  Int
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  dayOfWeek Int
+  startTime String
+  endTime   String
+
+  sessions Session[]
+}
+
+model Session {
+  id         Int            @id @default(autoincrement())
+  courseId   Int
+  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  scheduleId Int
+  schedule   CourseSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  date       DateTime
+  startTime  String
+  endTime    String
+  closedAt   DateTime?
+  createdAt  DateTime       @default(now())
+
+  attendances Attendance[]
+}
+
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studentId Int
+  student   User     @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, studentId])
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  sessionId   Int
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentId   Int
+  student     User     @relation(fields: [studentId], references: [id])
+  checkedInAt DateTime @default(now())
+  status      String   @default("present")
+
+  @@unique([sessionId, studentId])
+}
