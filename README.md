@@ -1,5 +1,7 @@
 # ClassChecking — ระบบเช็คชื่อนักศึกษา
 
+🔗 **Demo:** [class-checking.vercel.app](https://class-checking.vercel.app)
+
 ระบบเช็คชื่อนักศึกษาผ่านเว็บ รองรับ 2 role: **อาจารย์** และ **นักศึกษา**
 
 ## Features
